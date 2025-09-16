@@ -3,16 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOYOTA CIHAN COMPANY Stock Management</title>
+    <title>Cihan Toyota Stock Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase App (core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- Firebase Authentication -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -60,9 +52,6 @@
             color: white;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         h1 {
@@ -72,23 +61,10 @@
         }
 
         .creator {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-style: italic;
+            font-size: 0.9rem;
             color: var(--light-color);
             transition: color 1s ease;
-        }
-
-        .auth-container {
-            display: flex;
-            gap: 10px;
-        }
-
-        .auth-user {
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .dashboard {
@@ -162,10 +138,6 @@
 
         .btn-danger {
             background-color: var(--danger-color);
-        }
-
-        .btn-auth {
-            background-color: var(--warning-color);
         }
 
         table {
@@ -280,7 +252,6 @@
             margin-right: 5px;
             margin-bottom: 5px;
             font-size: 0.9rem;
-            font-weight: bold;
         }
 
         .tab.active {
@@ -317,71 +288,6 @@
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
-        }
-
-        .autocomplete-items {
-            position: absolute;
-            border: 1px solid #d4d4d4;
-            border-bottom: none;
-            border-top: none;
-            z-index: 99;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: white;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .autocomplete-items div {
-            padding: 10px;
-            cursor: pointer;
-            background-color: #fff;
-            border-bottom: 1px solid #d4d4d4;
-        }
-
-        .autocomplete-items div:hover {
-            background-color: #e9e9e9;
-        }
-
-        .autocomplete-active {
-            background-color: var(--secondary-color) !important;
-            color: white;
-        }
-
-        .autocomplete-container {
-            position: relative;
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .login-title {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-        }
-
-        .sync-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            background-color: var(--success-color);
-            color: white;
-            display: none;
-        }
-
-        .sync-status.offline {
-            background-color: var(--warning-color);
         }
 
         @media (min-width: 768px) {
@@ -465,400 +371,254 @@
                 padding: 6px 10px;
                 font-size: 0.8rem;
             }
-            
-            header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .auth-container {
-                width: 100%;
-                justify-content: center;
-            }
         }
     </style>
 </head>
 <body>
-    <div id="login-screen" class="login-container">
-        <h2 class="login-title">TOYOTA CIHAN COMPANY Stock Management</h2>
-        <div class="form-group">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" placeholder="Your email">
-        </div>
-        <div class="form-group">
-            <label for="login-password">Password</label>
-            <input type="password" id="login-password" placeholder="Your password">
-        </div>
-        <button id="login-btn" class="btn-auth" style="width: 100%;">Login</button>
-        <p style="text-align: center; margin-top: 15px;">
-            Don't have an account? <a href="#" id="show-register">Register</a>
-        </p>
-    </div>
+    <div class="container">
+        <header>
+            <h1>Cihan Toyota Stock Management System</h1>
+            <p class="creator" id="creator">Created by: Ibrahim Husen</p>
+        </header>
 
-    <div id="app-content" style="display: none;">
-        <div class="container">
-            <header>
-                <div>
-                    <h1>TOYOTA CIHAN COMPANY Stock Management System</h1>
-                    <p class="creator" id="creator">Created by: Ibrahim Husen</p>
-                </div>
-                <div class="auth-container">
-                    <span class="auth-user" id="user-email">Not logged in</span>
-                    <button id="logout-btn" class="btn-auth">Logout</button>
-                </div>
-            </header>
-
-            <div class="sync-status" id="sync-status">Online</div>
-
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-label">Total Parts</div>
-                    <div class="stat-value" id="total-parts">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Today's Sales</div>
-                    <div class="stat-value" id="daily-sales">0 IQD</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Yesterday Sales</div>
-                    <div class="stat-value" id="yesterday-sales">0 IQD</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">This Month Sales</div>
-                    <div class="stat-value" id="month-sales">0 IQD</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Last Month Sales</div>
-                    <div class="stat-value" id="last-month-sales">0 IQD</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Low Stock Items</div>
-                    <div class="stat-value" id="low-stock">0</div>
-                </div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Parts</div>
+                <div class="stat-value" id="total-parts">0</div>
             </div>
-
-            <div class="tabs">
-                <div class="tab active" data-tab="inventory">Inventory Management</div>
-                <div class="tab" data-tab="sales">Sales History</div>
-                <div class="tab" data-tab="daily-report">Daily Sales Report</div>
-                <div class="tab" data-tab="monthly-sales">Monthly Sales Report</div>
+            <div class="stat-card">
+                <div class="stat-label">This Month Sales</div>
+                <div class="stat-value" id="month-sales">0 IQD</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">Last Month Sales</div>
+                <div class="stat-value" id="last-month-sales">0 IQD</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Sales</div>
+                <div class="stat-value" id="daily-sales">0 IQD</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Low Stock Items</div>
+                <div class="stat-value" id="low-stock">0</div>
+            </div>
+        </div>
 
-            <div class="tab-content active" id="inventory-tab">
-                <div class="dashboard">
-                    <div class="left-panel">
-                        <div class="card">
-                            <h2 class="card-title">Add New Part</h2>
-                            <form id="add-part-form">
-                                <div class="form-group">
-                                    <label for="part-number">Part Number</label>
-                                    <input type="text" id="part-number" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="part-name">Part Name (Description)</label>
-                                    <input type="text" id="part-name" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="car-model">Car Model</label>
-                                    <input type="text" id="car-model" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="price">Price (IQD)</label>
-                                    <input type="number" id="price" min="0" step="100" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="location">Location</label>
-                                    <input type="text" id="location" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quantity">Quantity</label>
-                                    <input type="number" id="quantity" min="0" required>
-                                </div>
-                                <button type="submit" class="btn-add">Add Part</button>
-                            </form>
-                        </div>
+        <div class="tabs">
+            <div class="tab active" data-tab="inventory">Inventory Management</div>
+            <div class="tab" data-tab="sales">Sales History</div>
+            <div class="tab" data-tab="monthly-sales">Monthly Sales Report</div>
+        </div>
 
-                        <div class="card">
-                            <h2 class="card-title">Sell Item</h2>
-                            <form id="sell-form">
-                                <div class="form-group autocomplete-container">
-                                    <label for="sell-part">Part Number</label>
-                                    <input type="text" id="sell-part" required autocomplete="off">
-                                    <div id="autocomplete-list" class="autocomplete-items"></div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="sell-quantity">Quantity</label>
-                                    <input type="number" id="sell-quantity" min="1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="customer">Customer (Optional)</label>
-                                    <input type="text" id="customer">
-                                </div>
-                                <div class="form-group">
-                                    <label for="mobile">Mobile (Optional)</label>
-                                    <input type="text" id="mobile">
-                                </div>
-                                <button type="submit" class="btn-sell">Record Sale</button>
-                            </form>
-                        </div>
-
-                        <div class="card">
-                            <h2 class="card-title">Import Parts</h2>
-                            <button id="import-parts-btn" class="btn-add">Import Parts from List</button>
-                        </div>
-                    </div>
-
-                    <div class="right-panel">
-                        <div class="card">
-                            <h2 class="card-title">Inventory Management</h2>
-                            <div class="search-container">
-                                <input type="text" id="search-input" placeholder="Search by part number, car model, location, or part name...">
-                                <button id="search-btn">Search</button>
+        <div class="tab-content active" id="inventory-tab">
+            <div class="dashboard">
+                <div class="left-panel">
+                    <div class="card">
+                        <h2 class="card-title">Add New Part</h2>
+                        <form id="add-part-form">
+                            <div class="form-group">
+                                <label for="part-number">Part Number</label>
+                                <input type="text" id="part-number" required>
                             </div>
-                            <div style="overflow-x: auto;">
-                                <table id="inventory-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Part Number</th>
-                                            <th>Part Name</th>
-                                            <th>Car Model</th>
-                                            <th>Price (IQD)</th>
-                                            <th>Location</th>
-                                            <th>Quantity</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="inventory-body">
-                                        <!-- Inventory data will be populated here -->
-                                    </tbody>
-                                </table>
+                            <div class="form-group">
+                                <label for="part-name">Part Name (Description)</label>
+                                <input type="text" id="part-name" required>
                             </div>
+                            <div class="form-group">
+                                <label for="car-model">Car Model</label>
+                                <input type="text" id="car-model" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Price (IQD)</label>
+                                <input type="number" id="price" min="0" step="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input type="text" id="location" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="quantity">Quantity</label>
+                                <input type="number" id="quantity" min="0" required>
+                            </div>
+                            <button type="submit" class="btn-add">Add Part</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title">Sell Item</h2>
+                        <form id="sell-form">
+                            <div class="form-group">
+                                <label for="sell-part">Part Number</label>
+                                <input type="text" id="sell-part" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sell-quantity">Quantity</label>
+                                <input type="number" id="sell-quantity" min="1" required>
+                            </div>
+                            <button type="submit" class="btn-sell">Record Sale</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="card">
+                        <h2 class="card-title">Inventory Management</h2>
+                        <div class="search-container">
+                            <input type="text" id="search-input" placeholder="Search by part number, car model, location, or part name...">
+                            <button id="search-btn">Search</button>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table id="inventory-table">
+                                <thead>
+                                    <tr>
+                                        <th>Part Number</th>
+                                        <th>Part Name</th>
+                                        <th>Car Model</th>
+                                        <th>Price (IQD)</th>
+                                        <th>Location</th>
+                                        <th>Quantity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-body">
+                                    <!-- Inventory data will be populated here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="tab-content" id="sales-tab">
-                <div class="card">
-                    <h2 class="card-title">Sales History</h2>
-                    <div class="search-container">
-                        <input type="text" id="sales-search-input" placeholder="Search by part number, date (e.g., 15/9), car model, customer, mobile or location...">
-                        <button id="sales-search-btn">Search</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="sales-table">
-                            <thead>
-                                <tr>
-                                    <th>Date & Time</th>
-                                    <th>Part Number</th>
-                                    <th>Part Name</th>
-                                    <th>Car Model</th>
-                                    <th>Quantity</th>
-                                    <th>Price (IQD)</th>
-                                    <th>Total (IQD)</th>
-                                    <th>Location</th>
-                                    <th>Customer</th>
-                                    <th>Mobile</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sales-body">
-                                <!-- Sales data will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="daily-report-tab">
-                <div class="card">
-                    <h2 class="card-title">Daily Sales Report</h2>
-                    <div class="search-container">
-                        <input type="date" id="daily-report-date" value="">
-                        <button id="generate-daily-report">Generate Report</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="daily-report-table">
-                            <thead>
-                                <tr>
-                                    <th>Date & Time</th>
-                                    <th>Part Number</th>
-                                    <th>Part Name</th>
-                                    <th>Car Model</th>
-                                    <th>Quantity</th>
-                                    <th>Price (IQD)</th>
-                                    <th>Total (IQD)</th>
-                                    <th>Location</th>
-                                    <th>Customer</th>
-                                    <th>Mobile</th>
-                                </tr>
-                            </thead>
-                            <tbody id="daily-report-body">
-                                <!-- Daily sales data will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="monthly-sales-tab">
-                <div class="card">
-                    <h2 class="card-title">Monthly Sales Report</h2>
-                    <div class="search-container">
-                        <select id="day-select">
-                            <option value="">All Days</option>
-                            <!-- Days will be populated by JavaScript -->
-                        </select>
-                        <select id="month-select">
-                            <option value="0">January</option>
-                            <option value="1">February</option>
-                            <option value="2">March</option>
-                            <option value="3">April</option>
-                            <option value="4">May</option>
-                            <option value="5">June</option>
-                            <option value="6">July</option>
-                            <option value="7">August</option>
-                            <option value="8">September</option>
-                            <option value="9">October</option>
-                            <option value="10">November</option>
-                            <option value="11">December</option>
-                        </select>
-                        <select id="year-select">
-                            <!-- Years will be populated by JavaScript -->
-                        </select>
-                        <button id="generate-report">Generate Report</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="monthly-sales-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Part Number</th>
-                                    <th>Part Name</th>
-                                    <th>Car Model</th>
-                                    <th>Total Quantity Sold</th>
-                                    <th>Total Sales (IQD)</th>
-                                    <th>Customer</th>
-                                    <th>Mobile</th>
-                                </tr>
-                            </thead>
-                            <tbody id="monthly-sales-body">
-                                <!-- Monthly sales data will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="edit-modal" id="edit-modal">
-                <div class="edit-modal-content">
-                    <h2 class="card-title">Edit Part</h2>
-                    <form id="edit-part-form">
-                        <input type="hidden" id="edit-index">
-                        <div class="form-group">
-                            <label for="edit-part-number">Part Number</label>
-                            <input type="text" id="edit-part-number" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-part-name">Part Name (Description)</label>
-                            <input type="text" id="edit-part-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-car-model">Car Model</label>
-                            <input type="text" id="edit-car-model" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-price">Price (IQD)</label>
-                            <input type="number" id="edit-price" min="0" step="100" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-location">Location</label>
-                            <input type="text" id="edit-location" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-quantity">Quantity</label>
-                            <input type="number" id="edit-quantity" min="0" required>
-                        </div>
-                        <div class="action-buttons">
-                            <button type="submit" class="btn-add">Save Changes</button>
-                            <button type="button" id="cancel-edit">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <footer>
-                <p>TOYOTA CIHAN COMPANY Stock Management System &copy; 2023 | Created by Ibrahim Husen</p>
-            </footer>
         </div>
+
+        <div class="tab-content" id="sales-tab">
+            <div class="card">
+                <h2 class="card-title">Sales History</h2>
+                <div class="search-container">
+                    <input type="text" id="sales-search-input" placeholder="Search by part number, date (e.g., 15/9), car model, or location...">
+                    <button id="sales-search-btn">Search</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Part Number</th>
+                                <th>Part Name</th>
+                                <th>Car Model</th>
+                                <th>Quantity</th>
+                                <th>Price (IQD)</th>
+                                <th>Total (IQD)</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-body">
+                            <!-- Sales data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="monthly-sales-tab">
+            <div class="card">
+                <h2 class="card-title">Monthly Sales Report</h2>
+                <div class="search-container">
+                    <select id="month-select">
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                    <select id="year-select">
+                        <!-- Years will be populated by JavaScript -->
+                    </select>
+                    <button id="generate-report">Generate Report</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="monthly-sales-table">
+                        <thead>
+                            <tr>
+                                <th>Part Number</th>
+                                <th>Part Name</th>
+                                <th>Car Model</th>
+                                <th>Total Quantity Sold</th>
+                                <th>Total Sales (IQD)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthly-sales-body">
+                            <!-- Monthly sales data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="edit-modal" id="edit-modal">
+            <div class="edit-modal-content">
+                <h2 class="card-title">Edit Part</h2>
+                <form id="edit-part-form">
+                    <input type="hidden" id="edit-index">
+                    <div class="form-group">
+                        <label for="edit-part-number">Part Number</label>
+                        <input type="text" id="edit-part-number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-part-name">Part Name (Description)</label>
+                        <input type="text" id="edit-part-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-car-model">Car Model</label>
+                        <input type="text" id="edit-car-model" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-price">Price (IQD)</label>
+                        <input type="number" id="edit-price" min="0" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-location">Location</label>
+                        <input type="text" id="edit-location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-quantity">Quantity</label>
+                        <input type="number" id="edit-quantity" min="0" required>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-add">Save Changes</button>
+                        <button type="button" id="cancel-edit">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            <p>Cihan Toyota Stock Management System &copy; 2023 | Created by Ibrahim Husen</p>
+        </footer>
     </div>
 
     <script>
-       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCu8Uh2SvcxSzme9OEFFl3pUnbtRL0eGm8",
-  authDomain: "spatial-garage-472318-d6.firebaseapp.com",
-  projectId: "spatial-garage-472318-d6",
-  storageBucket: "spatial-garage-472318-d6.firebasestorage.app",
-  messagingSenderId: "427235902039",
-  appId: "1:427235902039:web:7e530a192dc39ac685d912",
-  measurementId: "G-R4P6XKZDVW"
-};
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // Parts data from the text file (truncated for brevity)
-        const partsData = [
-            { partNumber: "08886-02605", description: "E-TA FLUID TE 4L", quantity: 25, location: "1-A-2" },
-            { partNumber: "08886-02805", description: "AUTO FLUID WS 4L", quantity: 9, location: "1-A-4" },
-            // ... rest of your parts data
-        ];
-
-        // Global variables
-        let currentUser = null;
-        let inventory = [];
-        let sales = [];
-
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             console.log("Initializing application...");
             
-            // Set up authentication state listener
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    document.getElementById('user-email').textContent = user.email;
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('app-content').style.display = 'block';
-                    
-                    // Load data from Firestore
-                    loadInventory();
-                    loadSales();
-                    
-                    // Set up real-time listeners
-                    setupRealtimeListeners();
-                } else {
-                    currentUser = null;
-                    document.getElementById('login-screen').style.display = 'block';
-                    document.getElementById('app-content').style.display = 'none';
-                }
-            });
+            // Initialize inventory
+            initializeInventory();
             
-            // Login button
-            document.getElementById('login-btn').addEventListener('click', loginUser);
+            // Load inventory data
+            loadInventory();
             
-            // Show register link
-            document.getElementById('show-register').addEventListener('click', function(e) {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                registerUser(email, password);
-            });
+            // Load sales data
+            loadSales();
             
-            // Logout button
-            document.getElementById('logout-btn').addEventListener('click', logoutUser);
+            // Update statistics
+            updateStats();
             
             // Add part form submission
             document.getElementById('add-part-form').addEventListener('submit', function(e) {
@@ -896,11 +656,6 @@ const firebaseConfig = {
             // Generate monthly report
             document.getElementById('generate-report').addEventListener('click', function() {
                 generateMonthlyReport();
-            });
-            
-            // Generate daily report
-            document.getElementById('generate-daily-report').addEventListener('click', function() {
-                generateDailyReport();
             });
             
             // Allow Enter key for search
@@ -942,144 +697,105 @@ const firebaseConfig = {
             // Populate year dropdown
             populateYearDropdown();
             
-            // Populate day dropdown
-            populateDayDropdown();
-            
             // Set current month and year
             const now = new Date();
             document.getElementById('month-select').value = now.getMonth();
             document.getElementById('year-select').value = now.getFullYear();
             
-            // Set current date for daily report
-            document.getElementById('daily-report-date').valueAsDate = now;
-            
             // Start color animation for creator name
             animateCreatorColor();
-            
-            // Import parts button
-            document.getElementById('import-parts-btn').addEventListener('click', function() {
-                importPartsFromList();
-            });
-            
-            // Autocomplete for part number in sell form
-            setupAutocomplete();
-            
-            // Monitor online/offline status
-            window.addEventListener('online', function() {
-                document.getElementById('sync-status').textContent = 'Online';
-                document.getElementById('sync-status').classList.remove('offline');
-                document.getElementById('sync-status').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('sync-status').style.display = 'none';
-                }, 3000);
-            });
-            
-            window.addEventListener('offline', function() {
-                document.getElementById('sync-status').textContent = 'Offline - Data may not sync';
-                document.getElementById('sync-status').classList.add('offline');
-                document.getElementById('sync-status').style.display = 'block';
-            });
             
             console.log("Application initialized successfully");
         });
 
-        // Authentication functions
-        function loginUser() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    console.log("User logged in:", userCredential.user);
-                })
-                .catch((error) => {
-                    alert("Login error: " + error.message);
-                });
-        }
-        
-        function registerUser(email, password) {
-            if (!email || !password) {
-                alert("Please enter both email and password");
-                return;
+        // Initialize inventory in localStorage if not exists
+        function initializeInventory() {
+            try {
+                if (!localStorage.getItem('inventory')) {
+                    // Initialize with empty array
+                    localStorage.setItem('inventory', JSON.stringify([]));
+                }
+                
+                if (!localStorage.getItem('sales')) {
+                    localStorage.setItem('sales', JSON.stringify([]));
+                }
+            } catch (e) {
+                console.error("Error initializing inventory:", e);
+                alert("Error initializing storage. Please check if localStorage is available.");
             }
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    console.log("User registered:", userCredential.user);
-                })
-                .catch((error) => {
-                    alert("Registration error: " + error.message);
-                });
-        }
-        
-        function logoutUser() {
-            auth.signOut()
-                .then(() => {
-                    console.log("User signed out");
-                })
-                .catch((error) => {
-                    alert("Logout error: " + error.message);
-                });
         }
 
-        // Firestore functions
+        // Load inventory from localStorage
         function loadInventory() {
-            db.collection("inventory").orderBy("partNumber").get()
-                .then((querySnapshot) => {
-                    inventory = [];
-                    querySnapshot.forEach((doc) => {
-                        inventory.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderInventory();
-                    updateStats();
-                })
-                .catch((error) => {
-                    console.error("Error loading inventory:", error);
-                    alert("Error loading inventory data.");
+            try {
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                const tbody = document.getElementById('inventory-body');
+                tbody.innerHTML = '';
+                
+                if (inventory.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="7" style="text-align: center;">No inventory items found. Add your first part above.</td>`;
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                inventory.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.partNumber}</td>
+                        <td>${item.partName}</td>
+                        <td>${item.carModel}</td>
+                        <td>${item.price === 0 ? 'N/A' : formatCurrency(item.price)} IQD</td>
+                        <td>${item.location}</td>
+                        <td>${item.quantity}</td>
+                        <td class="action-buttons">
+                            <button onclick="showEditModal(${index})">Edit</button>
+                            <button class="btn-danger" onclick="deleteItem(${index})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
                 });
+            } catch (e) {
+                console.error("Error loading inventory:", e);
+                alert("Error loading inventory data.");
+            }
         }
-        
+
+        // Load sales from localStorage
         function loadSales() {
-            db.collection("sales").orderBy("date", "desc").get()
-                .then((querySnapshot) => {
-                    sales = [];
-                    querySnapshot.forEach((doc) => {
-                        sales.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderSales();
-                    updateStats();
-                })
-                .catch((error) => {
-                    console.error("Error loading sales:", error);
-                    alert("Error loading sales data.");
+            try {
+                const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+                const tbody = document.getElementById('sales-body');
+                tbody.innerHTML = '';
+                
+                if (sales.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="8" style="text-align: center;">No sales records found.</td>`;
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                sales.forEach(sale => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sale.date}</td>
+                        <td>${sale.partNumber}</td>
+                        <td>${sale.partName}</td>
+                        <td>${sale.carModel}</td>
+                        <td>${sale.quantity}</td>
+                        <td>${formatCurrency(sale.price)} IQD</td>
+                        <td>${formatCurrency(sale.total)} IQD</td>
+                        <td>${sale.location}</td>
+                    `;
+                    tbody.appendChild(row);
                 });
+            } catch (e) {
+                console.error("Error loading sales:", e);
+                alert("Error loading sales data.");
+            }
         }
-        
-        function setupRealtimeListeners() {
-            // Real-time inventory updates
-            db.collection("inventory")
-                .onSnapshot((querySnapshot) => {
-                    inventory = [];
-                    querySnapshot.forEach((doc) => {
-                        inventory.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderInventory();
-                    updateStats();
-                });
-            
-            // Real-time sales updates
-            db.collection("sales")
-                .orderBy("date", "desc")
-                .onSnapshot((querySnapshot) => {
-                    sales = [];
-                    querySnapshot.forEach((doc) => {
-                        sales.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderSales();
-                    updateStats();
-                });
-        }
-        
+
+        // Add new part to inventory
         function addPart() {
             try {
                 const partNumber = document.getElementById('part-number').value.trim();
@@ -1111,33 +827,32 @@ const firebaseConfig = {
                     carModel,
                     price,
                     location,
-                    quantity,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    quantity
                 };
                 
-                db.collection("inventory").add(newPart)
-                    .then(() => {
-                        // Reset form
-                        document.getElementById('add-part-form').reset();
-                        alert('Part added successfully!');
-                    })
-                    .catch((error) => {
-                        console.error("Error adding part:", error);
-                        alert("Error adding part. Please check your inputs.");
-                    });
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                inventory.push(newPart);
+                localStorage.setItem('inventory', JSON.stringify(inventory));
+                
+                // Reset form
+                document.getElementById('add-part-form').reset();
+                
+                // Reload inventory and update stats
+                loadInventory();
+                updateStats();
+                
+                alert('Part added successfully!');
             } catch (e) {
                 console.error("Error adding part:", e);
                 alert("Error adding part. Please check your inputs.");
             }
         }
-        
+
+        // Sell item
         function sellItem() {
             try {
                 const partNumber = document.getElementById('sell-part').value.trim();
                 const quantity = parseInt(document.getElementById('sell-quantity').value);
-                const customer = document.getElementById('customer').value.trim();
-                const mobile = document.getElementById('mobile').value.trim();
                 
                 if (!partNumber) {
                     alert('Please enter a part number');
@@ -1149,59 +864,59 @@ const firebaseConfig = {
                     return;
                 }
                 
-                // Find the part in our local inventory array
-                const part = inventory.find(item => item.partNumber === partNumber);
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                const partIndex = inventory.findIndex(item => item.partNumber === partNumber);
                 
-                if (!part) {
+                if (partIndex === -1) {
                     alert('Part not found!');
                     return;
                 }
                 
-                if (part.quantity < quantity) {
+                if (inventory[partIndex].quantity < quantity) {
                     alert('Insufficient stock!');
                     return;
                 }
                 
-                // Update quantity in Firestore
-                db.collection("inventory").doc(part.id).update({
-                    quantity: firebase.firestore.FieldValue.increment(-quantity),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then(() => {
-                    // Record sale
-                    const sale = {
-                        date: new Date().toISOString(),
-                        partNumber: part.partNumber,
-                        partName: part.partName,
-                        carModel: part.carModel,
-                        price: part.price,
-                        quantity: quantity,
-                        total: part.price * quantity,
-                        location: part.location,
-                        customer: customer,
-                        mobile: mobile,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    
-                    return db.collection("sales").add(sale);
-                })
-                .then(() => {
-                    // Reset form
-                    document.getElementById('sell-form').reset();
-                    alert('Sale recorded successfully!');
-                })
-                .catch((error) => {
-                    console.error("Error selling item:", error);
-                    alert("Error recording sale. Please check your inputs.");
-                });
+                // Update quantity
+                inventory[partIndex].quantity -= quantity;
+                
+                // Record sale
+                const sale = {
+                    date: new Date().toLocaleString(),
+                    partNumber: inventory[partIndex].partNumber,
+                    partName: inventory[partIndex].partName,
+                    carModel: inventory[partIndex].carModel,
+                    price: inventory[partIndex].price,
+                    quantity: quantity,
+                    total: inventory[partIndex].price * quantity,
+                    location: inventory[partIndex].location
+                };
+                
+                const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+                sales.unshift(sale); // Add to beginning of array
+                
+                localStorage.setItem('inventory', JSON.stringify(inventory));
+                localStorage.setItem('sales', JSON.stringify(sales));
+                
+                // Reset form
+                document.getElementById('sell-form').reset();
+                
+                // Reload inventory, sales and update stats
+                loadInventory();
+                loadSales();
+                updateStats();
+                
+                alert('Sale recorded successfully!');
             } catch (e) {
                 console.error("Error selling item:", e);
                 alert("Error recording sale. Please check your inputs.");
             }
         }
-        
+
+        // Show edit modal
         function showEditModal(index) {
             try {
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
                 const item = inventory[index];
                 
                 document.getElementById('edit-index').value = index;
@@ -1218,7 +933,8 @@ const firebaseConfig = {
                 alert("Error loading item for editing.");
             }
         }
-        
+
+        // Save edit
         function saveEdit() {
             try {
                 const index = document.getElementById('edit-index').value;
@@ -1245,122 +961,375 @@ const firebaseConfig = {
                     return;
                 }
                 
-                const item = inventory[index];
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
                 
-                // Update item in Firestore
-                db.collection("inventory").doc(item.id).update({
+                // Update item
+                inventory[index] = {
                     partNumber,
                     partName,
                     carModel,
                     price,
                     location,
-                    quantity,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then(() => {
-                    // Hide modal
-                    document.getElementById('edit-modal').style.display = 'none';
-                    alert('Item updated successfully!');
-                })
-                .catch((error) => {
-                    console.error("Error saving edit:", error);
-                    alert("Error saving changes.");
-                });
+                    quantity
+                };
+                
+                localStorage.setItem('inventory', JSON.stringify(inventory));
+                
+                // Hide modal
+                document.getElementById('edit-modal').style.display = 'none';
+                
+                // Reload inventory
+                loadInventory();
+                updateStats();
+                
+                alert('Item updated successfully!');
             } catch (e) {
                 console.error("Error saving edit:", e);
                 alert("Error saving changes.");
             }
         }
-        
+
+        // Delete item
         function deleteItem(index) {
             if (!confirm('Are you sure you want to delete this item?')) return;
             
             try {
-                const item = inventory[index];
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                inventory.splice(index, 1);
+                localStorage.setItem('inventory', JSON.stringify(inventory));
                 
-                db.collection("inventory").doc(item.id).delete()
-                    .then(() => {
-                        alert('Item deleted successfully!');
-                    })
-                    .catch((error) => {
-                        console.error("Error deleting item:", error);
-                        alert("Error deleting item.");
-                    });
+                // Reload inventory
+                loadInventory();
+                updateStats();
+                
+                alert('Item deleted successfully!');
             } catch (e) {
                 console.error("Error deleting item:", e);
                 alert("Error deleting item.");
             }
         }
-        
-        function renderInventory() {
-            const tbody = document.getElementById('inventory-body');
-            tbody.innerHTML = '';
-            
-            if (inventory.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="7" style="text-align: center;">No inventory items found. Add your first part above.</td>`;
-                tbody.appendChild(row);
-                return;
-            }
-            
-            inventory.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.partNumber}</td>
-                    <td>${item.partName}</td>
-                    <td>${item.carModel}</td>
-                    <td>${item.price === 0 ? 'N/A' : formatCurrency(item.price)} IQD</td>
-                    <td>${item.location}</td>
-                    <td>${item.quantity}</td>
-                    <td class="action-buttons">
-                        <button onclick="showEditModal(${index})">Edit</button>
-                        <button class="btn-danger" onclick="deleteItem(${index})">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-        
-        function renderSales() {
-            const tbody = document.getElementById('sales-body');
-            tbody.innerHTML = '';
-            
-            if (sales.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="10" style="text-align: center;">No sales records found.</td>`;
-                tbody.appendChild(row);
-                return;
-            }
-            
-            sales.forEach(sale => {
-                const row = document.createElement('tr');
-                const saleDate = new Date(sale.date);
-                const formattedDate = saleDate.toLocaleString();
+
+        // Search inventory
+        function searchInventory() {
+            try {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                if (!searchTerm) {
+                    loadInventory();
+                    return;
+                }
                 
-                row.innerHTML = `
-                    <td>${formattedDate}</td>
-                    <td>${sale.partNumber}</td>
-                    <td>${sale.partName}</td>
-                    <td>${sale.carModel}</td>
-                    <td>${sale.quantity}</td>
-                    <td>${formatCurrency(sale.price)} IQD</td>
-                    <td>${formatCurrency(sale.total)} IQD</td>
-                    <td>${sale.location}</td>
-                    <td>${sale.customer || '-'}</td>
-                    <td>${sale.mobile || '-'}</td>
-                `;
-                tbody.appendChild(row);
-            });
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                const tbody = document.getElementById('inventory-body');
+                tbody.innerHTML = '';
+                
+                const filteredItems = inventory.filter(item => {
+                    return (
+                        item.partNumber.toLowerCase().includes(searchTerm) ||
+                        item.partName.toLowerCase().includes(searchTerm) ||
+                        item.carModel.toLowerCase().includes(searchTerm) ||
+                        item.location.toLowerCase().includes(searchTerm)
+                    );
+                });
+                
+                if (filteredItems.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="7" style="text-align: center;">No matching items found.</td>`;
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                filteredItems.forEach((item, index) => {
+                    const originalIndex = inventory.findIndex(i => i.partNumber === item.partNumber);
+                    const row = document.createElement('tr');
+                    
+                    // Highlight matching text
+                    const partNumberCell = highlightText(item.partNumber, searchTerm);
+                    const partNameCell = highlightText(item.partName, searchTerm);
+                    const carModelCell = highlightText(item.carModel, searchTerm);
+                    const locationCell = highlightText(item.location, searchTerm);
+                    
+                    row.innerHTML = `
+                        <td>${partNumberCell}</td>
+                        <td>${partNameCell}</td>
+                        <td>${carModelCell}</td>
+                        <td>${item.price === 0 ? 'N/A' : formatCurrency(item.price)} IQD</td>
+                        <td>${locationCell}</td>
+                        <td>${item.quantity}</td>
+                        <td class="action-buttons">
+                            <button onclick="showEditModal(${originalIndex})">Edit</button>
+                            <button class="btn-danger" onclick="deleteItem(${originalIndex})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error("Error searching inventory:", e);
+                alert("Error searching inventory.");
+            }
         }
 
-        // The rest of your functions (searchInventory, searchSales, generateMonthlyReport, 
-        // generateDailyReport, populateYearDropdown, populateDayDropdown, highlightText, 
-        // updateStats, formatCurrency, animateCreatorColor, importPartsFromList, setupAutocomplete)
-        // would remain largely the same but would work with the Firestore data instead of localStorage
-        
-        // Note: For brevity, I haven't rewritten all functions, but they would need to be
-        // adapted to work with the Firestore data structure
+        // Search sales
+        function searchSales() {
+            try {
+                const searchTerm = document.getElementById('sales-search-input').value.toLowerCase();
+                if (!searchTerm) {
+                    loadSales();
+                    return;
+                }
+                
+                const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+                const tbody = document.getElementById('sales-body');
+                tbody.innerHTML = '';
+                
+                const filteredSales = sales.filter(sale => {
+                    // Check if search term matches date format like "15/9"
+                    let dateMatches = false;
+                    if (searchTerm.includes('/')) {
+                        try {
+                            const saleDate = new Date(sale.date);
+                            const day = saleDate.getDate();
+                            const month = saleDate.getMonth() + 1; // Months are 0-indexed
+                            
+                            // Check both "d/m" and "dd/mm" formats
+                            if (`${day}/${month}`.includes(searchTerm) || 
+                                `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`.includes(searchTerm)) {
+                                dateMatches = true;
+                            }
+                        } catch (e) {
+                            console.error("Error parsing date:", e);
+                        }
+                    }
+                    
+                    return (
+                        dateMatches ||
+                        sale.partNumber.toLowerCase().includes(searchTerm) ||
+                        sale.partName.toLowerCase().includes(searchTerm) ||
+                        sale.carModel.toLowerCase().includes(searchTerm) ||
+                        sale.location.toLowerCase().includes(searchTerm) ||
+                        sale.date.toLowerCase().includes(searchTerm)
+                    );
+                });
+                
+                if (filteredSales.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="8" style="text-align: center;">No matching sales records found.</td>`;
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                filteredSales.forEach(sale => {
+                    const row = document.createElement('tr');
+                    
+                    // Highlight matching text
+                    const partNumberCell = highlightText(sale.partNumber, searchTerm);
+                    const partNameCell = highlightText(sale.partName, searchTerm);
+                    const carModelCell = highlightText(sale.carModel, searchTerm);
+                    const locationCell = highlightText(sale.location, searchTerm);
+                    const dateCell = highlightText(sale.date, searchTerm);
+                    
+                    row.innerHTML = `
+                        <td>${dateCell}</td>
+                        <td>${partNumberCell}</td>
+                        <td>${partNameCell}</td>
+                        <td>${carModelCell}</td>
+                        <td>${sale.quantity}</td>
+                        <td>${formatCurrency(sale.price)} IQD</td>
+                        <td>${formatCurrency(sale.total)} IQD</td>
+                        <td>${locationCell}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error("Error searching sales:", e);
+                alert("Error searching sales records.");
+            }
+        }
 
+        // Generate monthly sales report
+        function generateMonthlyReport() {
+            try {
+                const month = parseInt(document.getElementById('month-select').value);
+                const year = parseInt(document.getElementById('year-select').value);
+                
+                const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+                const monthlySales = {};
+                
+                sales.forEach(sale => {
+                    try {
+                        const saleDate = new Date(sale.date);
+                        if (saleDate.getMonth() === month && saleDate.getFullYear() === year) {
+                            if (!monthlySales[sale.partNumber]) {
+                                monthlySales[sale.partNumber] = {
+                                    partNumber: sale.partNumber,
+                                    partName: sale.partName,
+                                    carModel: sale.carModel,
+                                    totalQuantity: 0,
+                                    totalSales: 0
+                                };
+                            }
+                            
+                            monthlySales[sale.partNumber].totalQuantity += sale.quantity;
+                            monthlySales[sale.partNumber].totalSales += sale.total;
+                        }
+                    } catch (e) {
+                        console.error("Error processing sale:", sale, e);
+                    }
+                });
+                
+                const tbody = document.getElementById('monthly-sales-body');
+                tbody.innerHTML = '';
+                
+                const salesData = Object.values(monthlySales);
+                
+                if (salesData.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="5" style="text-align: center;">No sales data found for the selected month.</td>`;
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                salesData.forEach(sale => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sale.partNumber}</td>
+                        <td>${sale.partName}</td>
+                        <td>${sale.carModel}</td>
+                        <td>${sale.totalQuantity}</td>
+                        <td>${formatCurrency(sale.totalSales)} IQD</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error("Error generating monthly report:", e);
+                alert("Error generating monthly report.");
+            }
+        }
+
+        // Populate year dropdown
+        function populateYearDropdown() {
+            try {
+                const yearSelect = document.getElementById('year-select');
+                const currentYear = new Date().getFullYear();
+                
+                // Clear existing options
+                yearSelect.innerHTML = '';
+                
+                for (let year = currentYear - 5; year <= currentYear + 1; year++) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                }
+                
+                yearSelect.value = currentYear;
+            } catch (e) {
+                console.error("Error populating year dropdown:", e);
+            }
+        }
+
+        // Highlight search results
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            
+            try {
+                // Escape special regex characters in searchTerm
+                const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
+            } catch (e) {
+                console.error("Error highlighting text:", e);
+                return text;
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            try {
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+                
+                // Total parts
+                document.getElementById('total-parts').textContent = inventory.length;
+                
+                // This month sales
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                const thisMonthSales = sales
+                    .filter(sale => {
+                        try {
+                            const saleDate = new Date(sale.date);
+                            return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
+                        } catch (e) {
+                            console.error("Error parsing sale date:", sale.date, e);
+                            return false;
+                        }
+                    })
+                    .reduce((sum, sale) => sum + sale.total, 0);
+                document.getElementById('month-sales').textContent = `${formatCurrency(thisMonthSales)} IQD`;
+                
+                // Last month sales
+                let lastMonth = currentMonth - 1;
+                let lastMonthYear = currentYear;
+                if (lastMonth < 0) {
+                    lastMonth = 11;
+                    lastMonthYear = currentYear - 1;
+                }
+                
+                const lastMonthSales = sales
+                    .filter(sale => {
+                        try {
+                            const saleDate = new Date(sale.date);
+                            return saleDate.getMonth() === lastMonth && saleDate.getFullYear() === lastMonthYear;
+                        } catch (e) {
+                            console.error("Error parsing sale date:", sale.date, e);
+                            return false;
+                        }
+                    })
+                    .reduce((sum, sale) => sum + sale.total, 0);
+                document.getElementById('last-month-sales').textContent = `${formatCurrency(lastMonthSales)} IQD`;
+                
+                // Today's sales
+                const today = new Date().toLocaleDateString();
+                const dailySales = sales
+                    .filter(sale => sale.date.includes(today))
+                    .reduce((sum, sale) => sum + sale.total, 0);
+                document.getElementById('daily-sales').textContent = `${formatCurrency(dailySales)} IQD`;
+                
+                // Low stock items (quantity less than 10)
+                const lowStock = inventory.filter(item => item.quantity < 10).length;
+                document.getElementById('low-stock').textContent = lowStock;
+            } catch (e) {
+                console.error("Error updating stats:", e);
+            }
+        }
+
+        // Format currency with thousands separators
+        function formatCurrency(amount) {
+            try {
+                return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            } catch (e) {
+                console.error("Error formatting currency:", e);
+                return amount;
+            }
+        }
+
+        // Animate creator color
+        function animateCreatorColor() {
+            try {
+                const creatorElement = document.getElementById('creator');
+                const colors = ['#ecf0f1', '#bdc3c7', '#3498db'];
+                let currentIndex = 0;
+                
+                setInterval(() => {
+                    creatorElement.style.color = colors[currentIndex];
+                    currentIndex = (currentIndex + 1) % colors.length;
+                }, 2000);
+            } catch (e) {
+                console.error("Error in color animation:", e);
+            }
+        }
     </script>
 </body>
 </html>
